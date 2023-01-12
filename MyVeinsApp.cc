@@ -19,8 +19,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
-
+#include "veins/modules/messages/EmergencyVehicle_m.h"
 #include "veins/modules/application/traci/MyVeinsApp.h"
+#include "veins/modules/messages/RSU_m.h"
 #define debugEV_clear EV
 #define debugEV EV << logName() << "::" << getClassName() << ": "
 using namespace veins;
@@ -38,8 +39,8 @@ void MyVeinsApp::initialize(int stage)
         sentMessage = false;
         lastDroveAt = simTime();
         currentSubscribedServiceId = -1;
-        cMessage* msg = new cMessage();
-        scheduleAt(simTime() + 1, msg);
+        //cMessage* msg = new cMessage();
+        //scheduleAt(simTime() + 1, msg);
         EV << "MyVeinsApp::initialize:::scheduelAt():  " << std::endl;
     }
     
@@ -52,17 +53,20 @@ void MyVeinsApp::onWSM(BaseFrame1609_4* wsm)
     EV << "MyVeinsApp::onWSM::stopTheVehicle: " << stopTheVehicle << std::endl;
     if(traciVehicle->getTypeId() == "car")
         {
-        EV << "MyVeinsApp::onWSM::" << mac->getMACAddress() << " " << stopTheVehicle << std::endl;
-        if(stopTheVehicle)
-        {
-            traciVehicle->setSpeed(0);
-            EV << "MyVeinsApp::onWSM::Stop the car" << std::endl;
-        }
-        else
-        {
-            traciVehicle->setSpeed(-1);
-            EV << "MyVeinsApp::onWSM::resume the car" << " and " << mac->getMACAddress()<< std::endl;
-        }
+        if (EmergencyVehicle* wsm1 = dynamic_cast<EmergencyVehicle*>(wsm))
+            {
+                EV << "MyVeinsApp::onWSM::" << mac->getMACAddress() << " " << stopTheVehicle << std::endl;
+                if(wsm1->stopTheVehicle)
+                {
+                    traciVehicle->setSpeed(0);
+                    EV << "MyVeinsApp::onWSM::Stop the car" << std::endl;
+                }
+                else
+                {
+                    traciVehicle->setSpeed(-1);
+                    EV << "MyVeinsApp::onWSM::resume the car" << " and " << mac->getMACAddress()<< std::endl;
+                }
+            }
         }
 }
 
@@ -91,40 +95,41 @@ void MyVeinsApp::handlePositionUpdate(cObject* obj)
         cJunctioncoord = myjunction.getPosition();
         EV << "MyVeinsApp::handlePositionUpdate:::::myjunction is: " <<cJunctioncoord << std::endl;
         EV << "MyVeinsApp::handlePositionUpdate:::::Currentposition is: " <<mobility->getPositionAt(simTime()) << std::endl;
-        EV << "MyVeinsApp::handlePositionUpdate:: " << stopTheVehicle << std::endl;
+        EV << "MyVeinsApp::handlePositionUpdate:: value of bool " << "'stopTheVehicle' is: " << stopTheVehicle << std::endl;
         EV << "MyVeinsApp::handlePositionUpdate:: " << traciVehicle->getTypeId() << std::endl;
         EV << "MyVeinsApp::handlePositionUpdate:: " << mac->getMACAddress() << std::endl;
+        EV << "handlePositionUpdate:::::Gunjan::mobility->getVehicleCommandInterface is:  " <<  mobility->getVehicleCommandInterface()<< std::endl;
         
         if (traciVehicle->getTypeId() == "rescue")
         {
          Coord Ambulance_position = mobility->getPositionAt(simTime()); //Coord is used for declaring data type
          double distance = cJunctioncoord.distance(Ambulance_position);
          EV << "handlePositionUpdate::::distance " << distance << std::endl;
-         if(distance <= 300)
+         if(distance <= 10 && !stopTheVehicle)
          {
-            EV << "MyVeinsApp::handlePositionUpdate::sendDown123:  " << std::endl;
+            EV << "MyVeinsApp::handlePositionUpdate::sendDown123:  " << distance << std::endl;
             //DemoSafetyMessage* bsm = new DemoSafetyMessage();
             //populateWSM(bsm);
             //sendDown(bsm->dup());//send wsa or wsm.
-            BaseFrame1609_4* wsm1 = new BaseFrame1609_4();
-            EV << "MyApplLayer::handlePositionUpdate:::::::::wsm1:" << std::endl;
-            stopTheVehicle = true;
+            EmergencyVehicle* wsm1 = new EmergencyVehicle(); // ambulance aaisa koi msg
+            EV << "MyApplLayer::handlePositionUpdate:::::::::wsm1:" << wsm1->stopTheVehicle << std::endl;
+            wsm1->stopTheVehicle = true; //EmergencyVehicle_m.h
+            stopTheVehicle = true; //from MyVeinApp.h to resume the Vehicle
             sendDown(wsm1);
             //send wsa or wsm. RSU11p would listen.
-            // ambulance aaisa koi msg
             // Car stop yourself
         }
-        }
         //EV << "handlePositionUpdate::::distance" << distance << std::endl;
-        else if(traciVehicle->getTypeId() == "car" && stopTheVehicle)
+        else if(stopTheVehicle && distance > 20) //using here
         {
             //traciVehicle->setSpeed(-1);
             EV << "handlePositionUpdate::::Stoppping the car" << std::endl;
-            BaseFrame1609_4* wsm1 = new BaseFrame1609_4();
+            EmergencyVehicle* wsm1 = new EmergencyVehicle();
             EV << "MyApplLayer::handlePositionUpdate::else if::wsm1:" << std::endl;
-            stopTheVehicle = false;
+            wsm1->stopTheVehicle = false;
             sendDown(wsm1);
          }
+        }
 }
 
 ////////////////////////////////////////////////////

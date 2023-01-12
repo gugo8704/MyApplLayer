@@ -31,7 +31,8 @@
 #include "veins/modules/mobility/traci/TraCIMobility.h"
 #include "veins/modules/application/traci/TraCIDemo11p.h"
 #include "veins/modules/application/traci/TraCIDemo11pMessage_m.h"
-
+#include "veins/modules/messages/EmergencyVehicle_m.h"
+#include "veins/modules/messages/RSU_m.h"
 using namespace omnetpp;
 using namespace std;
 
@@ -64,7 +65,7 @@ protected:
 
     void handleSelfMsg(cMessage* msg) override;
     void handlePositionUpdate(cObject* obj) override;
-    static bool stopTheVehicle;
+    static bool stopTheVehicle; //class scope. //To use line 68 have to write 77
     int count = 0;
     Coord cJunctioncoord; //parameter declaration to calculate junction Coords
     //Junction myjunction;  //parameter declaration
@@ -73,6 +74,9 @@ protected:
     cMessage* initMsg; //can two pointers "initMsg" and "phaseMsg" be of same type.
     cMessage* phaseMsg;
 };
-    bool MyVeinsApp::stopTheVehicle;
-
+    bool MyVeinsApp::stopTheVehicle; //way to define static variable
+    //A variable/static member is defined outside the class, so a variable can be accessed and get associated with the class. 
+    // static keyword is not written outside the definition of the class.
+    //one single copy of the object is created, and is not available as separate copy with each object, like other non-static data member.
+    
 } // namespace veins
