@@ -51,6 +51,8 @@ void MyVeinsApp::onWSM(BaseFrame1609_4* wsm)
     // application received a data message from another car or RSU // code for handling the message goes here, see TraciDemo11p.cc for examples
     //EV << "MyApplLayer::onWSM::getChannelNumber is: " <<frame->getChannelNumber() << ", psid is: " << frame->getPsid() << ", recipientAddress is: " << frame->getRecipientAddress() << std::endl;
     EV << "MyVeinsApp::onWSM::stopTheVehicle: " << stopTheVehicle << std::endl;
+    findHost()->getDisplayString().updateWith("r=16,green");
+    EV << "MyVeinsApp::onWSM::received a msg from RSU here" << std::endl;
     if(traciVehicle->getTypeId() == "car")
         {
         if (EmergencyVehicle* wsm1 = dynamic_cast<EmergencyVehicle*>(wsm))
@@ -111,8 +113,9 @@ void MyVeinsApp::handlePositionUpdate(cObject* obj)
             //DemoSafetyMessage* bsm = new DemoSafetyMessage();
             //populateWSM(bsm);
             //sendDown(bsm->dup());//send wsa or wsm.
-            EmergencyVehicle* wsm1 = new EmergencyVehicle(); // ambulance aaisa koi msg
+            EmergencyVehicle* wsm1 = new EmergencyVehicle("VeinsApp"); // ambulance aaisa koi msg
             EV << "MyApplLayer::handlePositionUpdate:::::::::wsm1:" << wsm1->stopTheVehicle << std::endl;
+            populateWSM(wsm1);
             wsm1->stopTheVehicle = true; //EmergencyVehicle_m.h
             stopTheVehicle = true; //from MyVeinApp.h to resume the Vehicle
             sendDown(wsm1);
@@ -156,15 +159,6 @@ void MyVeinsApp::onBSM(DemoSafetyMessage* bsm)
     }
     */
 }
-
 ////////////////////////////////////////////////////
 //              onBSM() ends here                //
 //////////////////////////////////////////////////
-
-/*
-void MyVeinsApp::finish()
-{
-    DemoBaseApplLayer::finish();
-    // statistics recording goes here
-}
-*/

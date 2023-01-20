@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2016 David Eckhoff <david.eckhoff@fau.de>
+// Copyright (C) 2006-2011 Christoph Sommer <christoph.sommer@uibk.ac.at>
 //
 // Documentation for these modules is at http://veins.car2x.org/
 //
@@ -20,22 +20,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-#pragma once
+package org.car2x.veins.modules.application.traci;
+import org.car2x.veins.modules.application.ieee80211p.DemoBaseApplLayer;
 
-#include "veins/modules/application/ieee80211p/DemoBaseApplLayer.h"
-//#include "veins/modules/messages/RSU_m.h"
-namespace veins {
-
-/**
- * Small RSU Demo using 11p
- */
-class VEINS_API TraCIDemoRSU11p : public DemoBaseApplLayer {
-protected:
-    void initialize(int stage);
-    void onWSM(BaseFrame1609_4* wsm) override;
-    void onWSA(DemoServiceAdvertisment* wsa) override;
-    void handlePositionUpdate(cObject* obj) override;
-    void handleSelfMsg(cMessage* msg) override;
-};
-
-} // namespace veins
+simple TraCIDemoRSU11p extends DemoBaseApplLayer
+{
+    @class(veins::TraCIDemoRSU11p);
+    @display("i=block/app2");
+}
