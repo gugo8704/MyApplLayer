@@ -65,6 +65,7 @@ protected:
 
     void handleSelfMsg(cMessage* msg) override;
     void handlePositionUpdate(cObject* obj) override;
+    void handleLowerMsg(cMessage* msg) override; // adding handleLowerMsg()
     static bool stopTheVehicle; //class scope. //To use line 68 have to write 77
     int count = 0;
     Coord cJunctioncoord; //parameter declaration to calculate junction Coords

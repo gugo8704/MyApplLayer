@@ -50,9 +50,12 @@ void MyVeinsApp::onWSM(BaseFrame1609_4* wsm)
 {
     // application received a data message from another car or RSU // code for handling the message goes here, see TraciDemo11p.cc for examples
     //EV << "MyApplLayer::onWSM::getChannelNumber is: " <<frame->getChannelNumber() << ", psid is: " << frame->getPsid() << ", recipientAddress is: " << frame->getRecipientAddress() << std::endl;
+    EV << "MyVeinsApp::onWSM::stopTheVehicle: " << std::endl;
+    /*
     EV << "MyVeinsApp::onWSM::stopTheVehicle: " << stopTheVehicle << std::endl;
     findHost()->getDisplayString().updateWith("r=16,green");
     EV << "MyVeinsApp::onWSM::received a msg from RSU here" << std::endl;
+    EV << "MyVeinsApp::onWSM::received a msg from RSU here" << wsm << std::endl;
     if(traciVehicle->getTypeId() == "car")
         {
         if (EmergencyVehicle* wsm1 = dynamic_cast<EmergencyVehicle*>(wsm))
@@ -70,6 +73,7 @@ void MyVeinsApp::onWSM(BaseFrame1609_4* wsm)
                 }
             }
         }
+        */
 }
 
 void MyVeinsApp::onWSA(DemoServiceAdvertisment* wsa)
@@ -88,6 +92,7 @@ void MyVeinsApp::handleSelfMsg(cMessage* msg)
 
 void MyVeinsApp::handlePositionUpdate(cObject* obj)
 {
+    
     count = count + 1;
     DemoBaseApplLayer::handlePositionUpdate(obj);
     // the vehicle has moved. Code that reacts to new positions goes here.
@@ -101,6 +106,9 @@ void MyVeinsApp::handlePositionUpdate(cObject* obj)
         EV << "MyVeinsApp::handlePositionUpdate:: " << traciVehicle->getTypeId() << std::endl;
         EV << "MyVeinsApp::handlePositionUpdate:: " << mac->getMACAddress() << std::endl;
         EV << "handlePositionUpdate:::::Gunjan::mobility->getVehicleCommandInterface is:  " <<  mobility->getVehicleCommandInterface()<< std::endl;
+        //std::string LaneId = "L2";
+        TraCICommandInterface::Lane mylane = traci->lane(LaneId);
+        EV << "MyVeinsApp::handlePositionUpdate:::::traci->Lane" << mylane.getRoadId() << std::endl;
         
         if (traciVehicle->getTypeId() == "rescue")
         {
@@ -162,3 +170,11 @@ void MyVeinsApp::onBSM(DemoSafetyMessage* bsm)
 ////////////////////////////////////////////////////
 //              onBSM() ends here                //
 //////////////////////////////////////////////////
+
+void MyVeinsApp::handleLowerMsg(cMessage* msg)
+{
+    EV << "MyVeinsApp::handleLowerMsg::" << std::endl;
+    EmergencyVehicle* WSM = dynamic_cast<EmergencyVehicle*>(msg);
+    //cPacket* enc = WSM->getEncapsulatedPacket();
+    EV << "message  received!!!" << endl;
+}
